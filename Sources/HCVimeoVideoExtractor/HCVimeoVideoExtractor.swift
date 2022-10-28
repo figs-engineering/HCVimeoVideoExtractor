@@ -97,8 +97,10 @@ public class HCVimeoVideoExtractor: NSObject {
                         return
                     }
                     
+                    let defaultCdn = (data as NSDictionary).value(forKeyPath: "request.files.hls.default_cdn") as? String
                     if let hls = (data as NSDictionary).value(forKeyPath: "request.files.hls.cdns") as? [String: AnyObject],
-                       let url = hls.first?.value["url"] as? String {
+                       let cdn = hls.first(where: { $0.key == defaultCdn})?.value as? [String: AnyObject] ?? hls.first?.value as? [String: AnyObject],
+                       let url = cdn["url"] as? String {
                         let video = HCVimeoVideo()
                         video.videoURL[.quality1080p] = URL(string: url)
                         completion(video, nil)
